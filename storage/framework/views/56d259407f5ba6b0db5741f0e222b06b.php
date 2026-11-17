@@ -1,0 +1,4 @@
+<svg stroke-width="1.5" x-show="!aiMode" class="header-search-icon pointer-events-none absolute start-3 top-1/2 z-10 w-5 -translate-y-1/2 opacity-75" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" />
+  <path d="M21 21l-6 -6" />
+</svg><?php /**PATH /home/u504467222/domains/omini.ai/public_html/storage/framework/views/03fa13ae8a973e6088bfdf4d85c99a58.blade.php ENDPATH**/ ?>

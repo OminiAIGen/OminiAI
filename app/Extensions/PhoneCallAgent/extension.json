@@ -1,0 +1,6 @@
+{
+    "name": "Phone Call Agent",
+    "type": "extension",
+    "version": "2.1",
+    "description": "Inbound & outbound AI phone call agent using Twilio or ElevenLabs"
+}

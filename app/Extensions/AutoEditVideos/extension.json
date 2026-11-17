@@ -1,0 +1,6 @@
+{
+    "name": "Auto Edit Videos",
+    "type": "extension",
+    "version": "1.0",
+    "description": "Auto Edit Videos extension for magicai — upload raw footage, describe the edit in plain language, and Rendley's agent cuts, captions and renders it."
+}

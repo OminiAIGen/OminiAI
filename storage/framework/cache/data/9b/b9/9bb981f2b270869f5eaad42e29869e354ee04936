@@ -1,0 +1,52 @@
+9999999999s:1024:"<table class="mb-4 w-full table-auto border-collapse border">
+		<thead>
+			<tr class="bg-foreground/10">
+				<th class="border p-2 text-start">Model</th>
+				<th class="border p-2 text-end">Credits</th>
+			</tr>
+		</thead>
+		<tbody>
+							
+													
+													
+													
+													
+													
+													
+													
+													
+													
+													
+													
+													
+									
+			<tr>
+        <td class="flex justify-between border-b p-2">
+            Video Dubbing (seconds)
+        </td>
+        <td class="border p-2 text-end">
+            20
+        </td>
+    </tr>
+
+			<tr>
+        <td class="flex justify-between border-b p-2">
+            UGC Creator (videos)
+        </td>
+        <td class="border p-2 text-end">
+            Unlimited
+        </td>
+    </tr>
+
+			<tr>
+        <td class="flex justify-between border-b p-2">
+            AI Captions (minutes)
+        </td>
+        <td class="border p-2 text-end">
+            10
+        </td>
+    </tr>
+
+		</tbody>
+	</table>
+";

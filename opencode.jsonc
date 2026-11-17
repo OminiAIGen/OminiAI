@@ -1,0 +1,22 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "laravel-boost": {
+      "type": "local",
+      "enabled": true,
+      "command": ["php", "artisan", "boost:mcp"],
+      "environment": {
+        "APP_ENV": "local",
+        "APP_DEBUG": "true",
+        "BOOST_ENABLED": "true"
+      }
+    },
+    "herd": {
+      "type": "local",
+      "command": ["php", "/Applications/Herd.app/Contents/Resources/herd-mcp.phar"],
+      "environment": {
+        "SITE_PATH": "/Users/yakupseymen/Documents/GitHub/magicai"
+      }
+    }
+  }
+}

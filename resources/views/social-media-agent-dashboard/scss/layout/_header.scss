@@ -1,0 +1,33 @@
+.lqd-header {
+
+	.header-actions-container {
+
+		> div:last-child {
+
+			> .lqd-btn,
+			> .lqd-dropdown > .lqd-btn,
+			> .notifications-wrap > .lqd-btn,
+			> .notifications-wrap > .lqd-dropdown > .lqd-btn,
+			> .header-search > .header-search-trigger,
+			.lqd-social-media-agent-notification-trigger {
+				@apply justify-center size-9 border rounded-full p-0;
+			}
+		}
+	}
+	.header-user-dropdown {
+
+		>.lqd-btn {
+			@apply size-[34px];
+		}
+	}
+
+	.header-language-dropdown {
+
+		>.lqd-btn {
+
+			svg {
+				@apply size-[22px];
+			}
+		}
+	}
+}

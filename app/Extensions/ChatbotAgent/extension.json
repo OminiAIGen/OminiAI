@@ -1,0 +1,6 @@
+{
+  "name": "Chatbot agent",
+  "type": "extension",
+  "version": "3.1",
+  "description": "Chatbot agent extension for magicai"
+}

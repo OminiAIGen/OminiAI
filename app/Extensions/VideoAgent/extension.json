@@ -1,0 +1,6 @@
+{
+    "name": "Video Agent",
+    "type": "extension",
+    "version": "1.0",
+    "description": "HeyGen v3 Video Agent for magicai — prompt to fully produced video with storyboard review, Look Pack styles, brand kits, avatars, voices and post-production tools."
+}

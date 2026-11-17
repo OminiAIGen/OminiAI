@@ -1,0 +1,18 @@
+.lqd-header {
+
+	.header-search {
+		@apply lg:!w-auto lg:flex lg:items-center;
+
+		.header-search-trigger {
+			@apply inline-grid place-items-center size-10 text-foreground bg-transparent p-0 rounded-none hover:bg-transparent;
+
+			>svg {
+				@apply size-5;
+			}
+
+			kbd {
+				@apply hidden;
+			}
+		}
+	}
+}

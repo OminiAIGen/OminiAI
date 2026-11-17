@@ -1,0 +1,56 @@
+.lqd-header {
+
+	.header-search {
+		@apply lg:!w-auto lg:flex lg:items-center;
+
+		.header-search-trigger {
+			@apply text-foreground bg-transparent p-0 rounded-none hover:bg-transparent;
+
+			>svg {
+				@apply size-5;
+			}
+
+			kbd {
+				@apply hidden;
+			}
+		}
+
+		.header-search-input-wrap {
+			@apply lg:flex lg:items-center;
+
+			>.header-search-kbd,
+			>.header-search-loader,
+			>.header-search-arrow {
+				@apply lg:hidden;
+			}
+
+			>.header-search-icon {
+				@apply lg:relative lg:top-auto lg:start-auto lg:translate-x-0 lg:translate-y-0 lg:opacity-100;
+			}
+
+			>.lqd-input-container {
+				@apply lg:size-6 lg:opacity-0 lg:absolute lg:top-0 lg:start-0;
+
+				.lqd-input {
+					@apply lg:p-0 lg:size-full lg:cursor-pointer;
+				}
+			}
+		}
+	}
+}
+
+.lqd-page-content-container {
+
+	.header-search {
+
+		.header-search-ai-indicator {
+			@apply start-14 sm:start-[70px];
+		}
+		&.ai-mode {
+
+			.header-search-input {
+				@apply ps-24 sm:ps-28;
+			}
+		}
+	}
+}
