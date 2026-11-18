@@ -94,6 +94,18 @@
 {!! $workbook->output !!}
 @endif
 			</textarea>
+            @php
+                $workbookCreditsUsed = isset($workbook) ? $workbook->credits_used : null;
+            @endphp
+            <div
+                id="workbook-credits-used"
+                class="{{ $workbookCreditsUsed === null ? 'hidden' : 'flex' }} mt-2 items-center gap-1.5 px-1 text-xs text-foreground/50"
+            >
+                <span>
+                    {{ __('Credits used') }}:
+                    <span data-credits-value>{{ $workbookCreditsUsed === null ? '' : rtrim(rtrim(number_format($workbookCreditsUsed, 2, '.', ''), '0'), '.') }}</span>
+                </span>
+            </div>
             <input
                 class="editor-cover-input hidden"
                 type="file"

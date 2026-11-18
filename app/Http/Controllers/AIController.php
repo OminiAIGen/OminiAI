@@ -809,6 +809,9 @@ class AIController extends Controller
         $entry->hash = Str::random(256);
         $entry->credits = countWords($entry->output);
         $entry->words = 0;
+        $entry->credits_used = $driver->isUnlimitedCredit()
+            ? null
+            : round($driver->input($entry->output)->calculateCredit()->getCalculatedInputCredit(), 2);
         $entry->save();
 
         $driver->input($entry->output)->calculateCredit()->decreaseCredit();

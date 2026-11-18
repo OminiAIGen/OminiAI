@@ -24,6 +24,7 @@ class UserOpenaiChatMessage extends Model
         'output',
         'hash',
         'credits',
+        'credits_used',
         'words',
         'images',
         'pdfName',
@@ -41,6 +42,7 @@ class UserOpenaiChatMessage extends Model
         'council_response'     => 'array',
         'used_skills'          => 'array',
         'used_connectors'      => 'array',
+        'credits_used'         => 'float',
     ];
 
     public function __construct(array $attributes = [])

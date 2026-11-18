@@ -209,6 +209,12 @@
                     'lqd-has-skill-block opacity-0' => $has_skill_block,
                 ])>{{ $has_canvas_content ? str()->of($output)->toHtmlString() : $output }}</pre>
 
+                @if ($message->credits_used !== null)
+                    <div class="lqd-credits-used mt-1 flex items-center gap-1.5 px-6 pb-3 text-xs text-foreground/50">
+                        <span>{{ __('Credits used') }}: {{ rtrim(rtrim(number_format($message->credits_used, 2, '.', ''), '0'), '.') }}</span>
+                    </div>
+                @endif
+
                 <div
                     class="lqd-chat-actions-wrap pointer-events-auto invisible absolute -end-5 bottom-0 flex flex-col gap-2 opacity-0 transition-all group-hover:!visible group-hover:!opacity-100">
                     @if ($is_chat_pro_image)

@@ -20,5 +20,10 @@ class AiMusicPro extends Model
         'music_style',
         'provider',
         'lyrics',
+        'credits_used',
+    ];
+
+    protected $casts = [
+        'credits_used' => 'float',
     ];
 }

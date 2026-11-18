@@ -94,6 +94,11 @@
                                     x-text="'Created ' + getCreatedTimeByString(Math.floor((new Date() - new Date(video.created_at)) / 1000))"
                                 >
                                 </span>
+                                <span
+                                    class="text-center text-2xs font-medium text-foreground"
+                                    x-show="video.credits_used !== null && video.credits_used !== undefined"
+                                    x-text="'{{ __('Credits used') }}: ' + video.credits_used"
+                                ></span>
                             </div>
                             <div class="flex items-center gap-3">
                                 <span

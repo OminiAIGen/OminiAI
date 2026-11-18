@@ -243,14 +243,14 @@
 
                         <div
                             class="flex w-full items-center justify-between gap-1 py-1.5 text-2xs font-medium"
-                            x-show="activeModal?.credits"
+                            x-show="activeModal?.credits_used || activeModal?.credits"
                         >
                             <p class="mb-0">
-                                @lang('Credit')
+                                {{ __('Credits used') }}
                             </p>
                             <p
                                 class="mb-0 opacity-50"
-                                x-text="activeModal?.credits || '{{ __('None') }}'"
+                                x-text="activeModal?.credits_used ?? activeModal?.credits ?? '{{ __('None') }}'"
                             ></p>
                         </div>
 

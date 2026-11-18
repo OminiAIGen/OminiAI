@@ -96,6 +96,7 @@ class GenerateAIImageJob implements ShouldQueue
             }
         } catch (Throwable $e) {
             $record->markAsFailed($e->getMessage());
+            $record->update(['credits_used' => 0]);
             $this->driver?->increaseCredit($this->driver?->calculate());
             Log::error(__('AI image generation failed'), [
                 'error'     => $e->getMessage(),

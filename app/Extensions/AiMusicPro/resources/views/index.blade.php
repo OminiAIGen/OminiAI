@@ -394,7 +394,8 @@
                         }
                     } else {
                         if (typeof toastr !== 'undefined') {
-                            toastr.success(res.message);
+                            const creditsNote = res.credits_used != null ? ` · ${res.credits_used} {{ __('credits used') }}` : '';
+                            toastr.success(res.message + creditsNote);
                         }
 
                         $("#generator_sidebar_table").html(res?.html2);

@@ -592,6 +592,19 @@ class AIImageProService
         return Blade::render("<x-tabler-{$iconName} class=\"size-4\" />");
     }
 
+    /**
+     * Credits charged for a generation, taken from the same driver calculation that is deducted.
+     * Returns null for guests and unlimited-credit users, where nothing is deducted.
+     */
+    public static function creditsUsedForDriver($driver): ?float
+    {
+        if (! $driver || $driver->isUnlimitedCredit()) {
+            return null;
+        }
+
+        return round((float) $driver->calculate(), 2);
+    }
+
     public static function dispatchImageGenerationJob(array $validated, ?int $userId, $driver): int
     {
         try {
@@ -609,7 +622,8 @@ class AIImageProService
                     'style_reference' => $validated['style_reference'] ?? null,
                     'image_reference' => $validated['image_reference'] ?? null,
                 ],
-                'status' => AiImageStatusEnum::PENDING,
+                'status'       => AiImageStatusEnum::PENDING,
+                'credits_used' => self::creditsUsedForDriver($driver),
             ]);
 
             // Attach record ID to job payload

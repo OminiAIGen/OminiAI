@@ -117,28 +117,60 @@
     </x-button>
 @endsection
 @section('titlebar_after')
-    <div class="w-full md:w-1/2 lg:w-1/3">
+    <div class="w-full md:w-2/3 lg:w-1/2">
         <form
+            class="flex items-center gap-3"
             x-init
             x-target="users-list"
             action="/dashboard/admin/users/search"
         >
-            <x-forms.input
-                class="lqd-users-search-input rounded-full bg-foreground/10 ps-10 placeholder:text-foreground"
-                id="search"
-                name="search"
-                size="sm"
-                type="search"
-                placeholder="{{ __('Search users') }}"
-                @input.debounce="$el.form.requestSubmit()"
-                @search="$el.form.requestSubmit()"
-            >
-                <x-slot:icon>
-                    <span class="absolute start-3 top-1/2 -translate-y-1/2">
-                        <x-tabler-search class="size-5" />
-                    </span>
-                </x-slot:icon>
-            </x-forms.input>
+            <div class="min-w-0 grow">
+                <x-forms.input
+                    class="lqd-users-search-input rounded-full bg-foreground/10 ps-10 placeholder:text-foreground"
+                    id="search"
+                    name="search"
+                    size="sm"
+                    type="search"
+                    placeholder="{{ __('Search users') }}"
+                    value="{{ request('search') }}"
+                    @input.debounce="$el.form.requestSubmit()"
+                    @search="$el.form.requestSubmit()"
+                >
+                    <x-slot:icon>
+                        <span class="absolute start-3 top-1/2 -translate-y-1/2">
+                            <x-tabler-search class="size-5" />
+                        </span>
+                    </x-slot:icon>
+                </x-forms.input>
+            </div>
+
+            <div class="relative shrink-0">
+                <select
+                    class="h-9 cursor-pointer appearance-none rounded-full bg-foreground/10 ps-4 pe-9 text-2xs font-medium text-heading-foreground outline-none transition-colors hover:bg-foreground/15 focus-visible:ring-2 focus-visible:ring-secondary"
+                    name="plan"
+                    aria-label="{{ __('Filter by plan') }}"
+                    @change="$el.form.requestSubmit()"
+                >
+                    <option value="">
+                        {{ __('All plans') }}
+                    </option>
+                    <option
+                        value="none"
+                        @selected(request('plan') === 'none')
+                    >
+                        {{ __('No plan') }}
+                    </option>
+                    @foreach ($plans as $plan)
+                        <option
+                            value="{{ $plan->id }}"
+                            @selected((string) request('plan') === (string) $plan->id)
+                        >
+                            {{ $plan->name }}
+                        </option>
+                    @endforeach
+                </select>
+                <x-tabler-chevron-down class="pointer-events-none absolute end-3 top-1/2 size-4 -translate-y-1/2 text-foreground/60" />
+            </div>
         </form>
     </div>
 @endsection

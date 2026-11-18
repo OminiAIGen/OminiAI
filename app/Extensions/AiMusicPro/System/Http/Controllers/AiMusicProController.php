@@ -62,7 +62,7 @@ class AiMusicProController extends Controller
         }
 
         $provider = setting('ai_music_pro_default_provider', 'elevenlabs');
-		$requestedMinutes = (float) $request->get('duration', 30) / 60;
+        $requestedMinutes = (float) $request->get('duration', 30) / 60;
 
         $entityEnum = match ($provider) {
             'lyria3clip' => EntityEnum::LYRIA_3_CLIP,
@@ -70,9 +70,8 @@ class AiMusicProController extends Controller
             default      => EntityEnum::ELEVENLABS_AI_MUSIC,
         };
 
-
         if ($provider === 'elevenlabs') {
-			$driver = Entity::driver($entityEnum)->inputMinute($requestedMinutes)->calculateCredit();
+            $driver = Entity::driver($entityEnum)->inputMinute($requestedMinutes)->calculateCredit();
         } else {
             $estimatedSeconds = $provider === 'lyria3clip' ? 30 : 120;
             $driver = Entity::driver($entityEnum)->inputSecond($estimatedSeconds)->calculateCredit();
@@ -96,10 +95,13 @@ class AiMusicProController extends Controller
         }
 
         if ($provider === 'elevenlabs') {
-            $driver->inputMinute($result['duration'])->calculateCredit()->decreaseCredit();
+            $driver->inputMinute($result['duration'])->calculateCredit();
         } else {
-            $driver->inputSecond($result['duration_seconds'])->calculateCredit()->decreaseCredit();
+            $driver->inputSecond($result['duration_seconds'])->calculateCredit();
         }
+
+        $creditsUsed = $this->creditsUsedForDriver($driver);
+        $driver->decreaseCredit();
 
         $this->storeMusicRecord(
             $result['file_url'],
@@ -108,7 +110,8 @@ class AiMusicProController extends Controller
             $result['duration'],
             $request->get('music_style'),
             $provider,
-            $result['lyrics'] ?? null
+            $result['lyrics'] ?? null,
+            $creditsUsed
         );
 
         if ($isDemo) {
@@ -123,9 +126,10 @@ class AiMusicProController extends Controller
         $html2 = view('ai-music-pro::components.generator_sidebar_table', compact('music'))->render();
 
         return response()->json([
-            'status'  => 'success',
-            'message' => __('Music generated successfully!'),
-            'html2'   => $html2,
+            'status'       => 'success',
+            'message'      => __('Music generated successfully!'),
+            'html2'        => $html2,
+            'credits_used' => $creditsUsed,
         ]);
     }
 
@@ -195,7 +199,8 @@ class AiMusicProController extends Controller
         float $voiceLengthMinutes,
         ?string $musicStyle,
         string $provider = 'elevenlabs',
-        ?string $lyrics = null
+        ?string $lyrics = null,
+        ?float $creditsUsed = null
     ): void {
         $voiceLengthSeconds = $voiceLengthMinutes * 60;
 
@@ -208,7 +213,21 @@ class AiMusicProController extends Controller
             'music_style'     => $musicStyle,
             'provider'        => $provider,
             'lyrics'          => $lyrics,
+            'credits_used'    => $creditsUsed,
         ]);
+    }
+
+    /**
+     * Credits charged for the song, from the same calculation that is deducted.
+     * Returns null for unlimited-credit users, where nothing is deducted.
+     */
+    private function creditsUsedForDriver($driver): ?float
+    {
+        if ($driver->isUnlimitedCredit()) {
+            return null;
+        }
+
+        return round((float) $driver->calculate(), 2);
     }
 
     public function delete($id): RedirectResponse

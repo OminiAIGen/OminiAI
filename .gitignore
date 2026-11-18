@@ -34,3 +34,5 @@ server.php
 /tests
 /update/tests
 
+# Storage (logs, caches, sessions, uploads) is not published
+/storage

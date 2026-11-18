@@ -24,6 +24,8 @@ class AiViralVizardController extends Controller
 {
     use HasErrorResponse;
 
+    private const PENDING_CREDITS_SESSION_KEY = 'ai_viral_clips_vizard_pending_credits';
+
     public VizardService $service;
 
     public function __construct()
@@ -71,6 +73,8 @@ class AiViralVizardController extends Controller
             $validated['subtitleSwitch'] = (int) $validated['subtitleSwitch'];
             $validated['maxClipNumber'] = (int) $validated['maxClipNumber'];
             $validated['ext'] = pathinfo($validated['videoUrl'], PATHINFO_EXTENSION);
+            $creditsUsed = $this->creditsUsedForDriver($driver);
+            session()->put(self::PENDING_CREDITS_SESSION_KEY, $creditsUsed);
             $driver->decreaseCredit();
 
             return $this->service->submitVideoForClipping($validated);
@@ -78,6 +82,42 @@ class AiViralVizardController extends Controller
             return $this->exceptionRes($th, 'error happen while generate short clips using vizard');
         }
 
+    }
+
+    /**
+     * Credits charged for the generation, from the same calculation that is deducted.
+     * Returns null for unlimited-credit users, where nothing is deducted.
+     */
+    private function creditsUsedForDriver($driver): ?float
+    {
+        if ($driver->isUnlimitedCredit()) {
+            return null;
+        }
+
+        return round((float) $driver->calculate(), 2);
+    }
+
+    /**
+     * Splits a total charge across clips in cents so the saved values add up to the charge exactly.
+     *
+     * @return array<int, float>
+     */
+    private function splitCreditsAcrossVideos(?float $total, int $count): array
+    {
+        if ($total === null || $count < 1) {
+            return [];
+        }
+
+        $totalCents = (int) round($total * 100);
+        $baseCents = intdiv($totalCents, $count);
+        $remainderCents = $totalCents % $count;
+
+        $shares = [];
+        for ($index = 0; $index < $count; $index++) {
+            $shares[] = round(($baseCents + ($index < $remainderCents ? 1 : 0)) / 100, 2);
+        }
+
+        return $shares;
     }
 
     // check the task status
@@ -101,6 +141,7 @@ class AiViralVizardController extends Controller
                 }
             }
 
+            $pendingVideos = [];
             foreach ($validated['videos'] as $video) {
                 $videoUrl = $video['videoUrl'];
 
@@ -116,13 +157,18 @@ class AiViralVizardController extends Controller
                 $filename = Str::uuid() . '.' . $extension;
                 Storage::disk('uploads')->put("videos/{$filename}", $videoContent);
 
-                ExportedVideo::create([
+                $pendingVideos[] = [
                     'video_url'    => Storage::disk('uploads')->url("videos/{$filename}"),
                     'used_ai_tool' => 'vizard',
                     'title'        => $video['title'],
                     'task_id'      => 'vizard-video-' . $video['videoId'],
                     'status'       => VideoStatusEnum::COMPLETED->value,
-                ]);
+                ];
+            }
+
+            $creditsPerVideo = $this->splitCreditsAcrossVideos(session()->pull(self::PENDING_CREDITS_SESSION_KEY), count($pendingVideos));
+            foreach ($pendingVideos as $index => $pendingVideo) {
+                ExportedVideo::create($pendingVideo + ['credits_used' => $creditsPerVideo[$index] ?? null]);
             }
 
             $storedVideos = ExportedVideo::whereIn('task_id', array_map(fn ($array) => 'vizard-video-' . $array['videoId'], $validated['videos']))->get();

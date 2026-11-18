@@ -135,9 +135,10 @@ class AIImageProController extends Controller
 
         if ($isAjax) {
             return response()->json([
-                'success'   => true,
-                'message'   => __('Image generation request submitted. Processing will start shortly.'),
-                'record_id' => $recordId,
+                'success'      => true,
+                'message'      => __('Image generation request submitted. Processing will start shortly.'),
+                'record_id'    => $recordId,
+                'credits_used' => AIImageProService::creditsUsedForDriver($driver),
             ]);
         }
 
@@ -549,6 +550,7 @@ class AIImageProController extends Controller
             'width'            => $width,
             'height'           => $height,
             'negative_prompt'  => $image->params['negative_prompt'] ?? null,
+            'credits_used'     => $image->credits_used !== null ? (float) $image->credits_used : null,
             'generated_images' => $image->generated_images ?? [],
             'thumbnails'       => array_map(fn (string $img): string => $this->getThumbnailUrl($img, 160, 160, 70), $image->generated_images ?? []),
             'date'             => optional($imageDate)->diffForHumans(),
@@ -1011,9 +1013,10 @@ class AIImageProController extends Controller
             }
 
             return response()->json([
-                'success'   => true,
-                'message'   => __('Image generation request submitted. Processing will start shortly.'),
-                'record_id' => $recordId,
+                'success'      => true,
+                'message'      => __('Image generation request submitted. Processing will start shortly.'),
+                'record_id'    => $recordId,
+                'credits_used' => AIImageProService::creditsUsedForDriver($driver),
             ]);
         } catch (Exception $e) {
             Log::error('Tool-based image generation failed', [

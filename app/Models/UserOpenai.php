@@ -35,6 +35,7 @@ class UserOpenai extends Model
         'output',
         'hash',
         'credits',
+        'credits_used',
         'words',
         'payload',
         'storage',
@@ -46,8 +47,9 @@ class UserOpenai extends Model
     ];
 
     protected $casts = [
-        'payload' => 'array',
-        'engine'  => EngineEnum::class,
+        'payload'      => 'array',
+        'engine'       => EngineEnum::class,
+        'credits_used' => 'float',
     ];
 
     protected $appends = [

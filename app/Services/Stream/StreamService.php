@@ -82,6 +82,8 @@ class StreamService
 
     private array $usedSkills = [];
 
+    private ?float $creditsUsedForResponse = null;
+
     private Collection $autoConnectors;
 
     private Collection $pausedConnectors;
@@ -221,6 +223,30 @@ class StreamService
         echo PHP_EOL;
         echo "event: skills_used\n";
         echo 'data: ' . json_encode(['skills' => $this->usedSkills]);
+        echo "\n\n";
+        $this->safeFlush();
+    }
+
+    /**
+     * Sends the credits this response consumes, so the chat UI can show them once the response is complete.
+     */
+    private function emitCreditsUsed(?BaseDriver $driver, string $responsedText): void
+    {
+        $this->creditsUsedForResponse = null;
+
+        if (! $driver || $this->tempChatActive || $this->isCouncilSubRequest || $driver->isUnlimitedCredit()) {
+            return;
+        }
+
+        $creditsUsed = round($driver->input($this->stripSuggestionsJson($responsedText))
+            ->calculateCredit()
+            ->getCalculatedInputCredit(), 2);
+
+        $this->creditsUsedForResponse = $creditsUsed;
+
+        echo PHP_EOL;
+        echo "event: credits_used\n";
+        echo 'data: ' . json_encode(['credits' => $creditsUsed]);
         echo "\n\n";
         $this->safeFlush();
     }
@@ -540,8 +566,9 @@ class StreamService
 
             $pass = false;
             if (MarketplaceHelper::isRegistered('ai-chat-pro-file-chat') && ((int) setting('chatpro_file_chat_allowed', 1) === 1)) {
+                $uploadIds = array_values(array_filter((array) request()?->input('upload_ids', []), 'is_string'));
                 $service = new AIFileChatService(
-                    request()?->input('upload_ids', []),
+                    $uploadIds === [] ? null : implode(',', $uploadIds),
                     request()?->input('chat_id')
                 );
 
@@ -3569,6 +3596,8 @@ class StreamService
             $this->entityHighlightsEnabled = false;
         }
 
+        $this->emitCreditsUsed($driver, $responsedText);
+
         echo "event: stop\n";
         echo 'data: [DONE]';
         echo "\n\n";
@@ -3611,6 +3640,7 @@ class StreamService
             $main_message->used_connectors = $this->usedConnectors;
         }
 
+        $main_message->credits_used = $this->creditsUsedForResponse;
         $main_message->save();
 
         if ($chat) {
@@ -3650,11 +3680,19 @@ class StreamService
 
     private function saveOtherStreamResponse($entry, $title, $responsedText, $output, $total_used_tokens, $driver): void
     {
+        // Only the workbook editor (template_type "writer") shows the credit counter; other templates keep their existing stream contract.
+        $creditsUsed = null;
+        if (request()?->input('template_type') === 'writer') {
+            $this->emitCreditsUsed($driver, $responsedText);
+            $creditsUsed = $this->creditsUsedForResponse;
+        }
+
         $entry->title = $title ?: null;
         $entry->credits = $total_used_tokens;
         $entry->words = $total_used_tokens;
         $entry->response = $responsedText;
         $entry->output = $output;
+        $entry->credits_used = $creditsUsed;
         $entry->save();
 
         $driver->input($responsedText)->calculateCredit()->decreaseCredit();

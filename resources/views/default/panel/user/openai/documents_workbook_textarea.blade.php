@@ -151,5 +151,11 @@
                 @csrf
             </form>
         @endif
+
+        @if ($workbook->credits_used !== null)
+            <p class="mb-0 mt-4 text-xs text-foreground/50">
+                {{ __('Credits used') }}: {{ rtrim(rtrim(number_format($workbook->credits_used, 2, '.', ''), '0'), '.') }}
+            </p>
+        @endif
     </div>
 </x-card>

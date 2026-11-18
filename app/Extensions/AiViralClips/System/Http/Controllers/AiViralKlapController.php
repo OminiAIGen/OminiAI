@@ -103,10 +103,12 @@ class AiViralKlapController extends Controller
 
         $driver = Entity::driver(EntityEnum::AI_CLIP_KLAP)->inputVideoCount(count($validated['project_ids']))->calculateCredit();
         $driver->redirectIfNoCreditBalance();
+        $creditsUsed = $this->creditsUsedForDriver($driver);
         $driver->decreaseCredit();
+        $creditsPerVideo = $this->splitCreditsAcrossVideos($creditsUsed, count($validated['project_ids']));
 
         try {
-            foreach ($validated['project_ids'] as $id) {
+            foreach ($validated['project_ids'] as $index => $id) {
 
                 $res = $this->service->exportShort()->submitTask([
                     'folder_id'  => $validated['folder_id'],
@@ -120,6 +122,7 @@ class AiViralKlapController extends Controller
                     'task_id'      => $requestId,
                     'status'       => VideoStatusEnum::IN_PROGRESS->value,
                     'used_ai_tool' => 'klap',
+                    'credits_used' => $creditsPerVideo[$index] ?? null,
                 ]);
             }
 
@@ -148,6 +151,42 @@ class AiViralKlapController extends Controller
         } catch (Throwable $th) {
             return $this->exceptionRes($th, 'Error happen while check export status on klap');
         }
+    }
+
+    /**
+     * Credits charged for the export, from the same calculation that is deducted.
+     * Returns null for unlimited-credit users, where nothing is deducted.
+     */
+    private function creditsUsedForDriver($driver): ?float
+    {
+        if ($driver->isUnlimitedCredit()) {
+            return null;
+        }
+
+        return round((float) $driver->calculate(), 2);
+    }
+
+    /**
+     * Splits a total charge across clips in cents so the saved values add up to the charge exactly.
+     *
+     * @return array<int, float>
+     */
+    private function splitCreditsAcrossVideos(?float $total, int $count): array
+    {
+        if ($total === null || $count < 1) {
+            return [];
+        }
+
+        $totalCents = (int) round($total * 100);
+        $baseCents = intdiv($totalCents, $count);
+        $remainderCents = $totalCents % $count;
+
+        $shares = [];
+        for ($index = 0; $index < $count; $index++) {
+            $shares[] = round(($baseCents + ($index < $remainderCents ? 1 : 0)) / 100, 2);
+        }
+
+        return $shares;
     }
 
     // store final video result from klap

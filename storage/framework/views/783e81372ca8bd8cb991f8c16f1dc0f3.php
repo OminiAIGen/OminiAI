@@ -1,3 +1,0 @@
-<svg :class="{ 'rotate-180': showContent }" class="size-4 transition" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path d="M6 9l6 6l6 -6" />
-</svg><?php /**PATH D:\omini_customization\OminiAI\storage\framework\views/df56942dcc3d69fc6de5fe02c6e36cf3.blade.php ENDPATH**/ ?>

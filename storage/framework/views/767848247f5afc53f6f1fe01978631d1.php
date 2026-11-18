@@ -1,3 +1,0 @@
-<svg :class="{ 'opacity-0': selectedModel !== 'nano-banana-pro' }" class="size-5 shrink-0" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path d="M5 12l5 5l10 -10" />
-</svg><?php /**PATH /home/u504467222/domains/omini.ai/public_html/storage/framework/views/6bd1cc6aa08ea13cceb22326de0f2aa8.blade.php ENDPATH**/ ?>

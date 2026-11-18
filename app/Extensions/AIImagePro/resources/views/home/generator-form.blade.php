@@ -658,7 +658,8 @@
                         if (response.ok && data.success) {
                             // Show success message
                             if (window.toastr) {
-                                window.toastr.success(data.message || '{{ __('Image generation started!') }}');
+                                const creditsNote = data.credits_used != null ? ` · ${data.credits_used} {{ __('credits used') }}` : '';
+                                window.toastr.success((data.message || '{{ __('Image generation started!') }}') + creditsNote);
                             }
 
                             // Notify the navbar to start polling for the new image

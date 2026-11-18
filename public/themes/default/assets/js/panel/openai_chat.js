@@ -1617,6 +1617,14 @@ function onAiResponse(responseObj) {
 		}
 	}
 
+	// Show the credits this response consumed, after the response text
+	if (typeof responseObj._creditsUsed === 'number') {
+		formattedResponse = (formattedResponse || '')
+			+ '<div class="lqd-credits-used mt-3 flex items-center gap-1.5 text-xs text-foreground/50">'
+			+ '<span>' + escapeHtml(magicai_localize.credits_used ?? 'Credits used') + ': ' + responseObj._creditsUsed + '</span>'
+			+ '</div>';
+	}
+
 	// When the response contains a social media post card, bypass the VDOM diff
 	// and use direct innerHTML so Alpine can properly initialize the component.
 	// The VDOM's cloneNode approach prevents Alpine from detecting new x-data elements.
@@ -2422,7 +2430,7 @@ function sendCouncilModelRequest(type, modelSlug, sharedMessageUUID, councilResp
 					}
 
 					// Skip non-content SSE events in council sub-requests
-					if (e.event === 'smart_image_search' || e.event === 'entity_highlights' || e.event === 'suggestions' || e.event === 'title' || e.event === 'skills_used' || e.event === 'connectors_used') {
+					if (e.event === 'smart_image_search' || e.event === 'entity_highlights' || e.event === 'suggestions' || e.event === 'title' || e.event === 'skills_used' || e.event === 'connectors_used' || e.event === 'credits_used') {
 						return;
 					}
 
@@ -3066,6 +3074,16 @@ function sendRequest(type, images, responseObj, sharedMessageUUID = null, reques
 					if (connectorsData?.connectors?.length) {
 						responseObj._usedConnectors = connectorsData.connectors;
 						throttledOnAiResponse(responseObj);
+					}
+				} catch (err) {}
+				return;
+			}
+
+			if (e.event === 'credits_used') {
+				try {
+					const creditsData = JSON.parse(txt);
+					if (typeof creditsData?.credits === 'number') {
+						responseObj._creditsUsed = creditsData.credits;
 					}
 				} catch (err) {}
 				return;

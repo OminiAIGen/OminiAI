@@ -31,6 +31,15 @@
             <th>
                 <button
                     class="table-sort"
+                    data-sort="sort-plan"
+                >
+                    <?php echo e(__('Plan')); ?>
+
+                </button>
+            </th>
+            <th>
+                <button
+                    class="table-sort"
                     data-sort="sort-country"
                 >
                     <?php echo e(__('Country')); ?>
@@ -72,6 +81,10 @@
                     </td>
                     <td class="sort-group">
                         <?php echo e($user->type->label()); ?>
+
+                    </td>
+                    <td class="sort-plan">
+                        <?php echo e($user->relationPlan?->name ?? __('No plan')); ?>
 
                     </td>
                     <td class="sort-country">
@@ -314,6 +327,9 @@
                 <td class="sort-group">
                     User
                 </td>
+                <td class="sort-plan">
+                    Pro
+                </td>
                 <td class="sort-remaining-words">
                     12.154
                 </td>
@@ -466,6 +482,9 @@
                 </td>
                 <td class="sort-group">
                     User
+                </td>
+                <td class="sort-plan">
+                    Basic
                 </td>
                 <td class="sort-remaining-words">
                     10.154

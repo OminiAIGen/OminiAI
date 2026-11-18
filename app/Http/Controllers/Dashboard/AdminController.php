@@ -7,12 +7,14 @@ use App\Actions\EmailConfirmation;
 use App\Domains\Entity\Models\Entity;
 use App\Domains\Marketplace\Repositories\Contracts\ExtensionRepositoryInterface;
 use App\Enums\AccessType;
+use App\Enums\Plan\TypeEnum;
 use App\Enums\Roles;
 use App\Extensions\MegaMenu\System\Models\MegaMenu;
 use App\Helpers\Classes\Helper;
 use App\Helpers\Classes\MarketplaceHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Finance\PaymentProcessController;
+use App\Http\Requests\Admin\UserListRequest;
 use App\Models\AccountDeletionReqs;
 use App\Models\Chatbot\Chatbot;
 use App\Models\ChatCategory;
@@ -55,6 +57,7 @@ use App\Services\UsersExportService;
 use Carbon\Carbon;
 use Exception;
 use Fahlisaputra\Minify\Middleware\MinifyHtml;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -122,31 +125,57 @@ class AdminController extends Controller
     }
 
     // USER MANAGEMENT
-    public function users(Request $request): View
+    public function users(UserListRequest $request): View
     {
-        $search = $request->input('search');
-        $users = User::query()
+        $users = $this->filteredUserListQuery($request)
             ->select(['id', 'name', 'surname', 'email', 'type', 'country', 'status', 'created_at'])
-            ->where('name', 'like', "%$search%")
-            ->orWhere('surname', 'like', "%$search%")
-            ->orWhere('email', 'like', "%$search%")
-            ->orWhere('phone', 'like', "%$search%")
-            ->paginate(10);
+            ->with('relationPlan')
+            ->paginate(10)
+            ->withQueryString();
 
-        return view('panel.admin.users.index', compact('users'));
+        $plans = Plan::query()
+            ->where('type', TypeEnum::SUBSCRIPTION->value)
+            ->orderBy('name')
+            ->get(['id', 'name']);
+
+        return view('panel.admin.users.index', compact('users', 'plans'));
     }
 
-    public function usersSearch(Request $request): View
+    public function usersSearch(UserListRequest $request): View
     {
-        $search = $request->input('search');
-        $users = User::query()
-            ->where('name', 'like', "%$search%")
-            ->orWhere('surname', 'like', "%$search%")
-            ->orWhere('email', 'like', "%$search%")
-            ->orWhere('phone', 'like', "%$search%")
+        $users = $this->filteredUserListQuery($request)
+            ->with('relationPlan')
             ->paginate(25);
 
         return view('panel.admin.users.components.users-table', compact('users'));
+    }
+
+    /**
+     * Filters users by search term and subscription plan.
+     * Plan filter values: a plan id, `none` for users without an active plan, or empty for all.
+     */
+    private function filteredUserListQuery(UserListRequest $request): Builder
+    {
+        $search = $request->validated('search');
+        $planFilter = $request->validated('plan');
+
+        return User::query()
+            ->when(filled($search), static function (Builder $query) use ($search): void {
+                $query->where(static function (Builder $query) use ($search): void {
+                    $query->where('name', 'like', "%$search%")
+                        ->orWhere('surname', 'like', "%$search%")
+                        ->orWhere('email', 'like', "%$search%")
+                        ->orWhere('phone', 'like', "%$search%");
+                });
+            })
+            ->when($planFilter === 'none', static function (Builder $query): void {
+                $query->whereDoesntHave('relationPlan');
+            })
+            ->when(is_numeric($planFilter), static function (Builder $query) use ($planFilter): void {
+                $query->whereHas('relationPlan', static function (Builder $query) use ($planFilter): void {
+                    $query->where('plans.id', (int) $planFilter);
+                });
+            });
     }
 
     public function usersActivity(): View

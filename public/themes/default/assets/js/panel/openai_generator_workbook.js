@@ -110,6 +110,22 @@ const generate = async ( message_no, creativity, maximum_length, number_of_resul
 						receivedMessageId = true;
 					}
 				} else {
+					if (e.event === 'credits_used') {
+						let creditsValue = null;
+						try {
+							creditsValue = JSON.parse(e.data)?.credits;
+						} catch (err) {}
+						const creditsCounter = document.getElementById('workbook-credits-used');
+						if (creditsCounter && typeof creditsValue === 'number' && Number.isFinite(creditsValue)) {
+							const creditsValueEl = creditsCounter.querySelector('[data-credits-value]');
+							if (creditsValueEl) {
+								creditsValueEl.textContent = String(Math.round(creditsValue * 100) / 100);
+							}
+							creditsCounter.classList.remove('hidden');
+							creditsCounter.classList.add('flex');
+						}
+						return;
+					}
 					if (e.data === '[DONE]') {
 						streaming = false;
 					}

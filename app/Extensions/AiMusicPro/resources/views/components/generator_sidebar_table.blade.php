@@ -34,6 +34,11 @@
 {{--							{{$song->duration ?? 0}} {{ __('seconds') }}--}}
 {{--						</span>--}}
 					</span>
+					@if ($song->credits_used !== null)
+						<span class="block opacity-60">
+							{{ __('Credits used') }}: {{ rtrim(rtrim(number_format($song->credits_used, 2, '.', ''), '0'), '.') }}
+						</span>
+					@endif
 				</td>
 				<td
 					class="data-audio mt-3 flex items-center"

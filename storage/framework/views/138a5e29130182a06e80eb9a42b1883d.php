@@ -1,2 +1,0 @@
-<script src="<?php echo e(custom_theme_url('/assets/js/panel/generateSEO.js')); ?>"></script>
-<?php /**PATH /home/u504467222/domains/omini.ai/public_html/app/Extensions/SEOTool/System/../resources/views/particles/generate-seo-script.blade.php ENDPATH**/ ?>
